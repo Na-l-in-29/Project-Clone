@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predictive Maintenance Dashboard</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Predictive Maintenance Dashboard</h1>
+    <form id="status-form">
+        <label for="machine-id">Select Machine ID:</label>
+        <select id="machine-id" name="machine_id">
+            <option value="">-- Select --</option>
+            {% for machine_id in machine_ids %}
+            <option value="{{ machine_id }}">{{ machine_id }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Check Status</button>
+    </form>
+
+    <div class="result" id="result"></div>
+
+    <script>
+        $(document).ready(function () {
+            $('#status-form').on('submit', function (e) {
+                e.preventDefault();
+                
+                // Get the selected machine ID
+                const machineId = $('#machine-id').val();
+                if (!machineId) {
+                    $('#result').text('Please select a Machine ID.');
+                    return;
+                }
+
+                // Send AJAX request to fetch status
+                $.post('/check_status', { machine_id: machineId }, function (response) {
+                    $('#result').text(`Machine Status: ${response.status}`);
+                }).fail(function (error) {
+                    const errorMessage = error.responseJSON?.error || 'An error occurred.';
+                    $('#result').text(errorMessage);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
